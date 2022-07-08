@@ -22,6 +22,9 @@ app.use((req, res, next) => {
     next();
 })
 
+app.get('/', (req,res)=>{
+    res.send('<h1>Xin chao </h1>')
+})
 // tat ca http request nao co tien to la /api/posts thi di vap post router
 //POST
 app.use('/api/posts', postRouter);
