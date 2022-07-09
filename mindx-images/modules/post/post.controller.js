@@ -36,7 +36,7 @@ const getPosts = async (req, res, next) => {
 const updatePost = async (req, res) => {
     // su dung csdl
     try {
-        
+
         const senderUser = req.user;
 
         const { postId } = req.params;
@@ -45,10 +45,10 @@ const updatePost = async (req, res) => {
         // chi user tao post  moi duoc sua post
         const foundPost = await PostModel.findById(postId);
         if (!foundPost) {
-            throw new HTTPError(400,'Post not found ')
+            throw new HTTPError(400, 'Post not found ')
         }
         if (String(foundPost.createdBy) !== String(senderUser._id)) {
-            throw new HTTPError(400,'This user do not have permission')
+            throw new HTTPError(400, 'This user do not have permission')
         }
 
         // const updatePost = await PostModel.findOne(
@@ -66,7 +66,7 @@ const updatePost = async (req, res) => {
         })
 
     } catch (error) {
-        res.status(400).send({ success: 0,message: error.message });
+        res.status(400).send({ success: 0, message: error.message });
     }
 }
 // DELETE 
@@ -83,9 +83,45 @@ const deletePost = async (req, res) => {
     }
 
 }
+
+const likePost = async (req, res) => {
+    // su dung csdl
+    try {
+        const { postId } = req.params;
+
+        const updatePost = await PostModel.findByIdAndUpdate(
+            postId,
+            { $inc: { likeCount: 1 } },
+            { new: true }
+        )
+        res.send({ success: 1, data: updatePost });
+
+    } catch (error) {
+        res.status(400).send({ success: 0, message: error.message });
+    }
+}
+
+const addTag = async (req, res) => {
+    // su dung csdl
+    try {
+        const { postId } = req.params;
+        const {tag:newTag} = req.body;
+
+        const updatePost = await PostModel.findByIdAndUpdate(
+            postId,
+            { $push: { tags: newTag } },
+            { new: true }
+        )
+        res.send({ success: 1, data: updatePost });
+
+    } catch (error) {
+        res.status(400).send({ success: 0, message: error.message });
+    }
+}
+
 module.exports = {
     createPost,
     getPosts,
     updatePost,
-    deletePost
+    deletePost,likePost, addTag
 }

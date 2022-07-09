@@ -9,6 +9,10 @@ const postShema = new mongoose.Schema({
     description: {
         type: String,
     },
+    likeCount:{
+        type:Number,
+    },
+    tags:[String],
     imageUrl:{
         type: String,
     },
