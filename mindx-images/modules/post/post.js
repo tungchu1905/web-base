@@ -19,7 +19,7 @@ const postShema = new mongoose.Schema({
     // comments: [commentShema],
     createdBy:{
         type: mongoose.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
     },
     
 },{
