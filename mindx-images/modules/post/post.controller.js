@@ -145,7 +145,7 @@ const updatePost = async (req, res) => {
         // chi user tao post  moi duoc sua post
         const foundPost = await PostModel.findById(postId);
         if (!foundPost) {
-            throw new HTTPError(400, 'Post not found ')
+            throw new HTTPError(400, 'Post not found ');
         }
         if (String(foundPost.createdBy) !== String(senderUser._id)) {
             throw new HTTPError(400, 'This user do not have permission')
