@@ -15,7 +15,7 @@ validateInput(createPostShema, 'body'),
 needAuthenticated, 
 postController.createPost)
 
-// read
+// read 
 router.get('/', 
 postController.getPosts)
 
@@ -31,6 +31,10 @@ postController.likePost)
 //Tag
 router.put('/:postId/tags',
 postController.addTag)
+
+// hot post > 10likes // SEARCH
+router.get('/hot',
+postController.getHotPosts)
 
 //delete
 router.delete('/:postId', 

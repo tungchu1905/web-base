@@ -1,5 +1,9 @@
 const PostModel = require('./post');
-const HTTPError = require('../../common/httpError')
+const HTTPError = require('../../common/httpError');
+const { getMaxListeners } = require('./post');
+const UserModel = require('../auth/user');
+const { post } = require('./post.router');
+
 
 //CREATE
 const createPost = async (req, res) => {
@@ -23,11 +27,107 @@ const createPost = async (req, res) => {
     }
 
 }
-// READ
+
+//get trending
+const getHotPosts = async (req, res, next) => {
+    try {
+        const posts = await PostModel.find({
+            likeCount: { $gt: 10 }
+        })
+            .sort({ likeCount: -1 })
+        res.send({ success: 1, data: posts });
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+// READ va phan trang
 const getPosts = async (req, res, next) => {
     try {
-        const posts = await PostModel.find({})
-        res.send({ success: 1, data: posts });
+        const { createdBy, keyword, tag, offset, limit,
+            sort
+        } = req.query;
+
+        //phan trang 
+        const offsetNumber = offset && Number(offset) ? Number(offset) : 0;
+        const limitNumber = limit && Number(limit) ? Number(limit) : 4;
+
+        let filter = {};
+        //sap xep
+        let sortCond = {}
+        if (sort) {
+            const [sortField, sortDirection] = sort.split('_');
+            if (sortField && sortDirection) {
+                sortCond[sortField] = sortDirection === 'desc' ? 1 : -1
+            }
+        }
+        // get post by createdBy
+        if (createdBy) {
+            filter.createdBy = createdBy
+        }
+
+        if (keyword) {
+            const regex = new RegExp(`${keyword}`, 'i')
+            const regexCond = { $regex: regex }
+            // filter.title = {$regex: regex}
+            filter['$or'] = [
+
+                { title: regexCond },
+                { description: regexCond }
+
+            ]
+        }
+
+        if (tag) {
+            filter.tags = tag
+        }
+        const [posts, totalPost] = await Promise.all([
+            PostModel
+                .find(filter)
+                .populate('createdBy', '-password -__v')
+                .skip(offsetNumber)
+                .limit(limitNumber)
+                .sort(sortCond),
+            PostModel.countDocuments(filter)
+        ])
+
+
+        const enhanceUsernamePosts = posts.map(post => {
+            const clonePost = JSON.parse(JSON.stringify(post));
+
+            return {
+                ...clonePost,
+                createdUsername: post.createdBy ? post.createdBy.username : "",
+                createdBy: post.createdBy ? post.createdBy._id : "",
+            }
+        })
+
+        // // const totalPost = await PostModel.countDocuments(filter);
+        // const totalPages = totalPost / limitNumbber
+
+        // //neu khong dung populate 
+        // const userIds = posts.map(post => post.createdBy)
+        // const users = await UserModel.find({
+        //     _id: { $in: userIds }
+        // });
+
+        // //
+        // let mapUser = {}
+        // users.forEach(u => {
+        //     mapUser[u._id] = u.username
+        // })
+
+
+
+        res.send({
+            success: 1,
+            data: {
+                data: enhanceUsernamePosts,
+                totalPosts: totalPost,
+                // pages: Math.ceil(totalPages)
+            }
+        });
     } catch (error) {
         next(error);
     }
@@ -105,7 +205,7 @@ const addTag = async (req, res) => {
     // su dung csdl
     try {
         const { postId } = req.params;
-        const {tag:newTag} = req.body;
+        const { tag: newTag } = req.body;
 
         const updatePost = await PostModel.findByIdAndUpdate(
             postId,
@@ -123,5 +223,8 @@ module.exports = {
     createPost,
     getPosts,
     updatePost,
-    deletePost,likePost, addTag
+    deletePost,
+    likePost,
+    addTag,
+    getHotPosts
 }
