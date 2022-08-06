@@ -1,14 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
 
+import './App.css';
+import Logo from './Logo'
+
+const number = 10
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
+        <Logo/>
+        {/* <img src={logo} className="App-logo" alt="logo" /> */}
+        <p className='App-p'>
+          {1+1}
+          Edit <code>src/App.js</code> and save to reload. Tungchu
+          {number}
         </p>
+        <Logo/>
         <a
           className="App-link"
           href="https://reactjs.org"
