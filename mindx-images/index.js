@@ -5,6 +5,7 @@ const authRouter = require('./modules/auth/auth.router');
 const uploadRouter = require('./modules/upload/upload.router')
 const commentRouter = require('./modules/comment/comment.router');
 const mongoose = require('mongoose');
+const cors = require('cors')
 
 mongoose.connect(process.env.MONGODB_URI, err => {
     if (err) {
@@ -16,7 +17,7 @@ const app = express();
 app.use(express.json());
 // express.json() la 1 ham 
 app.use(express.static('uploads'))
-
+app.use(cors())
 app.use((req, res, next) => {
     console.log('Time', Date.now(), req.method);
     next();
