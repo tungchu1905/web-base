@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router();
 const validateInput = require('../../middlewares/validateInput')
 const { loginShema, registerShema } = require('./auth.validation')
+const needAuthenticated = require('../../middlewares/needAuthenticated')
 
 const authController = require('./auth.controller')
 
@@ -10,8 +11,11 @@ const authController = require('./auth.controller')
 router.post('/register',
     validateInput(registerShema, 'body'),
     authController.register)
+
 router.post('/login',
     validateInput(loginShema, 'body'),
     authController.login)
+
+router.get('/verify',needAuthenticated, authController.verify)
 
 module.exports = router; 

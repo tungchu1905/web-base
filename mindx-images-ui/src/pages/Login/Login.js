@@ -1,8 +1,10 @@
 import React from "react";
-import axios from "axios";
+import axios from "../../api/request";
 import { useForm, useWatch, useFormState } from 'react-hook-form';
 import "./Login.css";
 import { Link, useNavigate, NavLink } from 'react-router-dom';
+import useAuth from "../../hooks/useAuth";
+import { useSearchParams } from 'react-router-dom'
 
 function SubmitButtonWithListenError({ isDirty, isValid, touchedFields }) {
   const touched = Object.keys(touchedFields).length > 0;
@@ -30,21 +32,31 @@ export default function Login() {
         mode: 'onChange'
       },
     );
-  const navigate = useNavigate();
-
+    
+  const { login } = useAuth()
+  const [searchParams] = useSearchParams();
 
   const onSubmit = async (values) => {
     const { username, password } = values;
     try {
       const res = await axios({
-        url: 'http://localhost:8080/api/auth/login',
+        url: '/api/auth/login',
         method: 'post',
         data: {
           username,
           password
         }
       });
-      console.log(res);
+
+      console.log(res)
+      if (res.success) {
+        localStorage.setItem('token', res.data.token)
+        login({
+          _id: res.data._id,
+          token: res.data.token,
+          returnUrl: searchParams.get('returnUrl') ?? ''
+        })
+      }
     } catch (err) {
       console.log(err);
     }

@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Button } from "react-bootstrap";
 import { useForm, Controller } from 'react-hook-form';
 import './SignUp.css';
-import axios from 'axios';
+import axios from '../../api/request';
 
 import { Link, useNavigate, NavLink } from 'react-router-dom';
 
@@ -23,7 +23,7 @@ function SignUp() {
     const { username, password } = values; 
     try {
       const res = await axios({
-        url: 'http://localhost:8080/api/auth/signup',
+        url: '/api/auth/signup',
         method: 'post',
         data: {
           username,
@@ -33,6 +33,7 @@ function SignUp() {
       if (res.data.success) {
         navigate('/')
       }
+      console.log(res)
     } catch (err) {
       console.log(err);
     }
