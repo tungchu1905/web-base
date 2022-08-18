@@ -18,6 +18,11 @@ postController.createPost)
 // read 
 router.get('/', 
 postController.getPosts)
+// get 1 post
+router.get(
+    '/:postId',
+    postController.getPost
+  );
 
 // update
 router.put('/:postId',

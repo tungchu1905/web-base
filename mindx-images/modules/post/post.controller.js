@@ -13,7 +13,7 @@ const createPost = async (req, res) => {
         console.log(req.user)
 
         const senderUser = req.user;
-        const { title, description, imageUrl, createdBy } = req.body;
+        const { title, description, imageUrl } = req.body;
 
         const newPost = await PostModel.create({
             title,
@@ -219,6 +219,13 @@ const addTag = async (req, res) => {
     }
 }
 
+const getPost = async (req, res) => {
+    const { postId } = req.params;
+  
+    console.log('vo day');
+    const post = await PostModel.findById(postId);
+    res.send({ success: 1, data: post });
+  }
 module.exports = {
     createPost,
     getPosts,
@@ -226,5 +233,6 @@ module.exports = {
     deletePost,
     likePost,
     addTag,
-    getHotPosts
+    getHotPosts,
+    getPost
 }

@@ -36,7 +36,7 @@ export default function ListPost() {
           status: "success",
           data: {
             posts: res.data.data,
-            totalPosts: res.data.totalPosts,
+            total: res.data.total,
           },
         });
       } else {

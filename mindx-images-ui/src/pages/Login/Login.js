@@ -1,26 +1,39 @@
 import React from "react";
-import axios from "../../api/request";
+import { useDispatch } from 'react-redux';
+import { login } from '../../slices/authSlice';
+import axios from '../../api/request';
 import { useForm, useWatch, useFormState } from 'react-hook-form';
 import "./Login.css";
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import useAuth from "../../hooks/useAuth";
-import { useSearchParams } from 'react-router-dom'
+import useAuth from '../../hooks/useAuth';
+import { useSearchParams } from 'react-router-dom'; 
+// function SubmitButton({ control }) {
+//   const { username, password } = useWatch({ control });
+
+//   const disabled = !username || !password
+
+//   return (
+//     <button type="submit" className="btn btn-primary btn-block" disabled={disabled}>
+//       Đăng nhập
+//     </button>
+//   )
+// }
 
 function SubmitButtonWithListenError({ isDirty, isValid, touchedFields }) {
   const touched = Object.keys(touchedFields).length > 0;
   const disabled = !isValid || !touched
 
   return (
-    <button
-      type="submit"
+    <button 
+      type="submit" 
       className="btn btn-primary btn-block" disabled={disabled}>
       Đăng nhập
     </button>
   )
 }
 export default function Login() {
-  const {
-    register,
+  const { 
+    register, 
     formState: { errors, isDirty, isValid, touchedFields },
     control,
     handleSubmit } = useForm(
@@ -32,12 +45,13 @@ export default function Login() {
         mode: 'onChange'
       },
     );
-    
-  const { login } = useAuth()
+  const dispatch = useDispatch();
+
   const [searchParams] = useSearchParams();
+  console.log('fields', touchedFields)
 
   const onSubmit = async (values) => {
-    const { username, password } = values;
+    const { username, password } = values; 
     try {
       const res = await axios({
         url: '/api/auth/login',
@@ -47,28 +61,27 @@ export default function Login() {
           password
         }
       });
-
-      console.log(res)
+      
       if (res.success) {
-        localStorage.setItem('token', res.data.token)
-        login({
+        dispatch(login({
           _id: res.data._id,
           token: res.data.token,
           returnUrl: searchParams.get('returnUrl') ?? ''
-        })
+        }));
       }
     } catch (err) {
       console.log(err);
     }
   };
 
+
   return (
     <div className="Login container-fluid" style={{ background: "#fafafa" }}>
       <div className="vh-100 justify-content-md-center align-items-center row">
         <div className="col-md-4 col-12">
           <div className="card-wrapper p-4">
-            <form className=""
-              onSubmit={handleSubmit(onSubmit)}
+            <form className="" 
+              onSubmit={handleSubmit(onSubmit)} 
               autoComplete="off"
             >
               <h4 className="mb-4">MindX Images</h4>
@@ -93,8 +106,9 @@ export default function Login() {
                   {errors?.password?.type === 'required' && <p>Password không được để trống</p>}
                   {errors?.password?.type === 'minLength' && <p>Password phải lớn hơn 6 kí tự</p>}
                 </div>
-
+              
               </div>
+              {/* <SubmitButton control={control} /> */}
               <SubmitButtonWithListenError isDirty={isDirty} isValid={isValid} touchedFields={touchedFields} />
             </form>
           </div>
